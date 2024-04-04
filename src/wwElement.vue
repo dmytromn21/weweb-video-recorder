@@ -27,7 +27,7 @@ export default {
   name: "VideoRecording",
   data() {
     return {
-      api_url: 'http://clownfish-app-9zwdy.ondigitalocean.app:8080',
+      api_url: 'https://proxy.cors.sh/' + 'http://clownfish-app-9zwdy.ondigitalocean.app:8080',
       isUploading: false,
       isUploaded: false,
       isRecording: false,
@@ -112,7 +112,7 @@ export default {
     },
     async uploadVideoToMux(blob) {
       this.isUploading = true;
-      const uploadConfigResponse = await fetch(`${this.api_url}/video-upload/get-upload-url`);
+      const uploadConfigResponse = await fetch(`${this.api_url}/video-upload/get-upload-url`, {headers: {'x-cors-api-key': "temp_368b76b526936e794eb3e109cc7fb026"}});
       const uploadConfig = await uploadConfigResponse.json();
       const uploadURL = uploadConfig.url;
       const uploadID = uploadConfig.id;
@@ -124,7 +124,7 @@ export default {
         });
         this.isUploaded = true;
         this.isUploading = false;
-        const uploadDataResponse = await fetch(`${this.api_url}/video-upload/get-playback-id?upload_id=${uploadID}`)
+        const uploadDataResponse = await fetch(`${this.api_url}/video-upload/get-playback-id?upload_id=${uploadID}`, {headers: {'x-cors-api-key': "temp_368b76b526936e794eb3e109cc7fb026"}})
         const uploadData = await uploadDataResponse.json();
         this.$refs.muxplayer.setAttribute("playback-id", uploadData.playback_ids[0].id);
       } catch(error) {
