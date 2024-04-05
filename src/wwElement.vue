@@ -17,8 +17,7 @@
     <div class="btn-container">
       <button @click="startRecording" :disabled="isRecording || isUploading">Start Recording</button>
       <button @click="stopRecording" :disabled="!isRecording || isUploading">Stop Recording</button>
-      <button @click="testCamera" :hidden="isTestingCam" :disabled="isRecording || isUploading">Test Camera</button>
-      <button @click="pauseCamera" :hidden="!isTestingCam" :disabled="isRecording || isUploading">Pause</button>
+      <button @click="isTestingCam ? testCamera : pauseCamera" :hidden="isTestingCam" :disabled="isRecording || isUploading">{{isTestingCam ? "Test Cam" : "Pause"}}</button>
       <!-- <input type="file" @change="playbackFromFile" accept="video/webm" style="display: none" ref="fileInput"/>
       <button @click="triggerFileInput" :disabled="isRecording">Playback</button> -->
       <input type="file" @change="handleUploadFileInput" style="display: none" ref="fileUploadInput"/>
