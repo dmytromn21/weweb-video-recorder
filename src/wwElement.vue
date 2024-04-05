@@ -217,6 +217,8 @@ button {
   border-radius: 5px;
   font-size: 16px;
   width: 150px;
+  display: flex;
+  justify-content: center;
 }
 
 button:disabled {
