@@ -1,25 +1,29 @@
 <template>
   <div class="container">
-    <div class="spinner" :hidden="!isUploading"></div>
-    <video :hidden="isUploaded" ref="camera" autoplay></video>
-    <div class="" :hidden="!isUploaded">
-      <mux-player
-        class="video-player"
-        ref="muxplayer"
-        playback-id=""
-        metadata-video-title="Test video title"
-        metadata-viewer-user-id="user-id-007"
-      ></mux-player>
+    <div class="camera-container">
+      <div class="spinner" :hidden="!isUploading"></div>
+      <div class="recording-spinner" :hidden="!isRecording"></div>
+      <video :hidden="isUploaded" ref="camera" autoplay></video>
+      <div :hidden="!isUploaded">
+        <mux-player
+          class="video-player"
+          ref="muxplayer"
+          playback-id=""
+          metadata-video-title="Test video title"
+          metadata-viewer-user-id="user-id-007"
+        ></mux-player>
+      </div>
     </div>
     <div class="btn-container">
-      <button @click="startRecording" :disabled="isRecording">Start Recording</button>
-      <button @click="stopRecording" :disabled="!isRecording">Stop Recording</button>
-      <input type="file" @change="playbackFromFile" accept="video/webm" style="display: none" ref="fileInput"/>
-      <button @click="triggerFileInput" :disabled="isRecording">Playback</button>
+      <button @click="startRecording" :disabled="isRecording || isUploading">Start Recording</button>
+      <button @click="stopRecording" :disabled="!isRecording || isUploading">Stop Recording</button>
+      <button @click="testCamera" :hidden="isTestingCam" :disabled="isRecording || isUploading">Test Camera</button>
+      <button @click="pauseCamera" :hidden="!isTestingCam" :disabled="isRecording || isUploading">Pause</button>
+      <!-- <input type="file" @change="playbackFromFile" accept="video/webm" style="display: none" ref="fileInput"/>
+      <button @click="triggerFileInput" :disabled="isRecording">Playback</button> -->
       <input type="file" @change="handleUploadFileInput" style="display: none" ref="fileUploadInput"/>
-      <button @click="triggerFileUplaodInput" :disabled="isRecording">Upload Video</button>
+      <button @click="triggerFileUplaodInput" :disabled="isRecording || isUploading">Upload Video</button>
     </div>
-    <div v-if="isRecording" class="recording-indicator">Recording...</div>
   </div>
 </template>
 <script>
@@ -31,6 +35,7 @@ export default {
       isUploading: false,
       isUploaded: false,
       isRecording: false,
+      isTestingCam: false,
       recordedBlobs: [],
       mediaRecorder: null,
     };
@@ -47,7 +52,8 @@ export default {
           }
         };
       } catch (e) {
-        console.error('Error accessing media devices.', e);
+        alert('Error accessing media devices. Please check your camera again.');
+        return;
       }
     },
     startRecording() {
@@ -62,9 +68,11 @@ export default {
     },
 
     _startRecording() {
-      this.recordedBlobs = [];
-      this.mediaRecorder.start();
-      this.isRecording = true;
+      if(this.$refs.camera.srcObject) {
+        this.recordedBlobs = [];
+        this.mediaRecorder.start();
+        this.isRecording = true;
+      }
     },
     stopRecording() {
       return new Promise((resolve, reject) => {
@@ -76,7 +84,7 @@ export default {
           this.mediaRecorder.stop();
       }).then(() => {
           this.isRecording = false;
-
+          this.$refs.camera.srcObject = null;
           // Ensure there's recorded data
           if (this.recordedBlobs.length > 0) {
           const blob = new Blob(this.recordedBlobs, { type: 'video/webm' });
@@ -87,6 +95,20 @@ export default {
       }).catch((error) => {
           console.error('Error stopping media recorder:', error);
       });
+    },
+    async testCamera() {
+      try {
+        this.isTestingCam = true;
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        this.$refs.camera.srcObject = stream;
+      } catch (e) {
+        this.isTestingCam = false;
+        alert("Camera test faild. Please check your web camera.");
+      }
+    },
+    pauseCamera () {
+      this.$refs.camera.srcObject = null;
+      this.isTestingCam = false;
     },
     triggerFileInput() {
       this.$refs.fileInput.click();
@@ -122,11 +144,13 @@ export default {
           body: blob,
           headers: { "content-type": blob.type}
         });
-        this.isUploaded = true;
-        this.isUploading = false;
         const uploadDataResponse = await fetch(`${this.api_url}/video-upload/get-playback-id?upload_id=${uploadID}`, {headers: {'x-cors-api-key': "temp_368b76b526936e794eb3e109cc7fb026"}})
         const uploadData = await uploadDataResponse.json();
-        this.$refs.muxplayer.setAttribute("playback-id", uploadData.playback_ids[0].id);
+        setTimeout(() => {
+          this.isUploaded = true;
+          this.$refs.muxplayer.setAttribute("playback-id", uploadData.playback_ids[0].id);
+          this.isUploading = false;
+        }, 5000);
       } catch(error) {
         console.error(error);
       }
@@ -138,16 +162,15 @@ export default {
     scriptTag.src = "https://cdn.jsdelivr.net/npm/@mux/mux-player";
     scriptTag.id = "mux-player";
     document.getElementsByTagName('head')[0].appendChild(scriptTag);
-    this.init();
   },
 };
 </script>
 
 <style scoped>
 .spinner {
-  top: 50%;
+  top: 48%;
+  left: 48%;
   position: absolute;
-  justify-self: center;
   border: 4px solid rgba(0, 0, 0, 0.1);
   width: 40px;
   height: 40px;
@@ -169,33 +192,71 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-video {
+.camera-container {
+  background-color: black;
+  position: relative;
+  width: 640px;
+  height: 480px;
   border: 1px solid black;
+}
+video {
   width: 640px;
   height: 480px;
 }
 .video-player {
-  border: 1px solid black;
   width: 640px;
   height: 480px;
 }
 button {
   background-color: #007bff;
   color: white;
+  font-weight: 550;
   border: 1px solid #007bff;
-  padding: 10px 20px;
+  padding: 10px 0px;
   cursor: pointer;
   border-radius: 5px;
   font-size: 16px;
+  width: 150px;
+}
+
+button:disabled {
+  background-color: grey;
+  border: 1px solid grey;
 }
 .btn-container {
+  width: 640px;
   margin-top: 10px;
   margin-bottom: 10px;
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
 }
-.recording-indicator {
-  color: red;
-  margin-top: 10px;
+.recording-spinner {
+  position: absolute;
+  top: 10px; /* Adjust as needed */
+  right: 10px; /* Adjust as needed */
+  width: 15px; /* Size of the spinner */
+  height: 15px; /* Size of the spinner */
+  border-radius: 50%;
+  background-color: red;
+  box-shadow: 0 0 0 0 rgba(255, 0, 0, 1);
+  transform: scale(1);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
 }
 </style>
