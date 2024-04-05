@@ -17,7 +17,7 @@
     <div class="btn-container">
       <button @click="startRecording" :disabled="isRecording || isUploading">Start Recording</button>
       <button @click="stopRecording" :disabled="!isRecording || isUploading">Stop Recording</button>
-      <button @click="isTestingCam ? pauseCamera : testCamera" :hidden="isTestingCam" :disabled="isRecording || isUploading">{{isTestingCam ? "Pause" : "Test Cam"}}</button>
+      <button @click="handleClickTestCam" :hidden="isTestingCam" :disabled="isRecording || isUploading">{{isTestingCam ? "Pause" : "Test Cam"}}</button>
       <!-- <input type="file" @change="playbackFromFile" accept="video/webm" style="display: none" ref="fileInput"/>
       <button @click="triggerFileInput" :disabled="isRecording">Playback</button> -->
       <input type="file" @change="handleUploadFileInput" style="display: none" ref="fileUploadInput"/>
@@ -95,14 +95,21 @@ export default {
           console.error('Error stopping media recorder:', error);
       });
     },
+    handleClickTestCam () {
+      if(this.isTestingCam) {
+        this.pauseCamera();
+      } else {
+        this.testCamera();
+      }
+    },
     async testCamera() {
       try {
         this.isTestingCam = true;
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         this.$refs.camera.srcObject = stream;
       } catch (e) {
-        this.isTestingCam = false;
         alert("Camera test faild. Please check your web camera.");
+        this.isTestingCam = false;
       }
     },
     pauseCamera () {
