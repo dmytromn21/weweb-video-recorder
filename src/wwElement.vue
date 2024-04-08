@@ -28,6 +28,9 @@
 <script>
 export default {
   name: "VideoRecording",
+  props: {
+        content: { type: Object, required: true },
+  },
   data() {
     return {
       api_url: 'https://proxy.cors.sh/' + 'http://clownfish-app-9zwdy.ondigitalocean.app:8080',
@@ -103,7 +106,7 @@ export default {
       }
     },
     async testCamera() {
-      console.log(wwLib, "slkdfjklsdjfks")
+      console.log(this.content, "slkdfjklsdjfks")
       try {
         this.isTestingCam = true;
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
