@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <h1>{{ content.userID }}</h1>
     <div class="camera-container">
       <div class="spinner" :hidden="!isUploading"></div>
       <div class="recording-spinner" :hidden="!isRecording"></div>
@@ -103,7 +104,6 @@ export default {
       }
     },
     async testCamera() {
-      alert(content.userID, "This is the current user ID");
       try {
         this.isTestingCam = true;
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
