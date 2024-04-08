@@ -103,6 +103,7 @@ export default {
       }
     },
     async testCamera() {
+      console.log(wwLib, "slkdfjklsdjfks")
       try {
         this.isTestingCam = true;
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
