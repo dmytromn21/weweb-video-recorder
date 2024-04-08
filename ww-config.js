@@ -5,12 +5,13 @@ export default {
     },
   },
   properties: {
-    textColor: {
+    userID: {
       label: {
-        en: "Text color",
-      },
-      type: "Color",
-      defaultValue: "#F23636",
+        en: "User ID"
+      }, 
+      type: "Text",
+      defaultValue: null,
+      bindable: true,
     },
   },
 };

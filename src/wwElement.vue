@@ -41,6 +41,7 @@ export default {
   },
   methods: {
     async init() {
+      console.log(content.userID, "fsdfsdfdsfsdf")
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         this.$refs.camera.srcObject = stream;
