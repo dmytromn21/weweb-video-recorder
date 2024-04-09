@@ -163,6 +163,8 @@ export default {
       // Reset states as necessary
       this.isPlaying = false;
       this.isUploaded = false;
+
+      this.testCamera();
       // Additional cleanup as needed
     },
     getButtonTitle() {
