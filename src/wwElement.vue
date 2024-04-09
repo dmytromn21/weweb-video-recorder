@@ -32,7 +32,7 @@
               <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 7V18C6 19.1046 6.89543 20 8 20H16C17.1046 20 18 19.1046 18 18V7M6 7H5M6 7H8M18 7H19M18 7H16M10 11V16M14 11V16M8 7V5C8 3.89543 8.89543 3 10 3H14C15.1046 3 16 3.89543 16 5V7M8 7H16" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             </button>
           </div>
-          <button @click="handleClickTestCam" :hidden="isTestingCam" :disabled="isRecording || isUploading">{{isTestingCam ? "Turn off Cam" : "Turn on Cam"}}</button>
+          <!-- <button @click="handleClickTestCam" :hidden="isTestingCam" :disabled="isRecording || isUploading">{{isTestingCam ? "Turn off Cam" : "Turn on Cam"}}</button> -->
           <!-- <input type="file" @change="playbackFromFile" accept="video/webm" style="display: none" ref="fileInput"/>
           <button @click="triggerFileInput" :disabled="isRecording">Playback</button> -->
         </div>
@@ -75,7 +75,7 @@ export default {
         return;
       }
     },
-    handleShowRecordModal() {
+    async handleShowRecordModal() {
       this.showModal = true;
       this.recordedBlobs = [];
       this.isUploaded = false;
@@ -83,6 +83,7 @@ export default {
       this.mediaRecorder = null;
       this.isPlaying = false;
       this.isUploading = false;
+      this.testCamera();
     },
     handleRecording() {
       if(!this.isRecording && this.recordedBlobs.length == 0) {
@@ -186,13 +187,13 @@ export default {
         console.error('No recorded data available');
       }
     },
-    handleClickTestCam () {
-      if(this.isTestingCam) {
-        this.pauseCamera();
-      } else {
-        this.testCamera();
-      }
-    },
+    // handleClickTestCam () {
+    //   if(this.isTestingCam) {
+    //     this.pauseCamera();
+    //   } else {
+    //     this.testCamera();
+    //   }
+    // },
     async testCamera() {
       try {
         this.isTestingCam = true;
@@ -205,7 +206,7 @@ export default {
           }
         };
       } catch (e) {
-        alert("Camera test faild. Please check your web camera.");
+        alert("Can't turn on your camera. Please check your web camera.");
         this.isTestingCam = false;
       }
     },
