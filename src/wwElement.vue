@@ -206,7 +206,7 @@ export default {
           }
         };
       } catch (e) {
-        alert("Can't turn on your camera. Please check your web camera.");
+        console.log("Can't turn on your camera. Please check your web camera.");
         this.isTestingCam = false;
       }
     },
